@@ -9,6 +9,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="ModelProject" target="21" />
+      <module name="tripeDES" target="21" />
       <module name="tripleDES" target="21" />
     </bytecodeTargetLevel>
   </component>
