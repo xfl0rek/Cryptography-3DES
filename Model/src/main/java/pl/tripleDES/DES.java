@@ -1,6 +1,7 @@
 package pl.tripleDES;
 
 public class DES {
+    private byte[] key;
     final byte[] pBlock = {16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
                             2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25};
 
@@ -46,4 +47,76 @@ public class DES {
                7, 11,  4, 1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
                2,  1, 14, 7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11}
     };
+
+    private final static byte[] shifts = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+
+    private final static byte[] PC1 = {
+            57, 49, 41, 33, 25, 17,  9,
+            1, 58, 50, 42, 34, 26, 18,
+            10,  2, 59, 51, 43, 35, 27,
+            19, 11,  3, 60, 52, 44, 36,
+            63, 55, 47, 39, 31, 23, 15,
+            7, 62, 54, 46, 38, 30, 22,
+            14,  6, 61, 53, 45, 37, 29,
+            21, 13,  5, 28, 20, 12,  4};
+
+    private final static byte[] PC2 = {
+            14, 17, 11, 24,  1,  5,  3, 28,
+            15,  6, 21, 10, 23, 19, 12,  4,
+            26,  8, 16,  7, 27, 20, 13,  2,
+            41, 52, 31, 37, 47, 55, 30, 40,
+            51, 45, 33, 48, 44, 49, 39, 56,
+            34, 53, 46, 42, 50, 36, 29, 32};
+
+    public DES(byte[] key) {
+        this.key = key;
+    }
+
+    private byte[] permute(byte[] input, byte[] table) {
+        byte[] output = new byte[table.length];
+        for (int i = 0; i < table.length; i++) {
+            int bitIndex = table[i] - 1;
+            int byteIndex = bitIndex / 8;
+            int bitOffset = 7 - (bitIndex % 8);
+
+            byte mask = (byte) (1 << bitOffset);
+            output[i] = (byte) ((input[byteIndex] & mask) != 0 ? 1 : 0);
+        }
+        return output;
+    }
+
+    private byte[] leftShift(byte[] input, int shift) {
+        byte[] output = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            output[i] = input[(i + shift) % input.length];
+        }
+        return output;
+    }
+
+    public byte[][] generateSubKeys() {
+        byte[] permutedKey = permute(key, PC1);
+
+        byte[] c0 = new byte[28];
+        byte[] d0 = new byte[28];
+        System.arraycopy(permutedKey, 0, c0, 0, 28);
+        System.arraycopy(permutedKey, 28, d0, 0, 28);
+
+        byte[][] subKeys = new byte[16][48];
+
+        for (int i = 0; i < 16; i++) {
+            byte[] cTemp = leftShift(c0, shifts[i]);
+            byte[] dTemp = leftShift(d0, shifts[i]);
+
+            byte[] cdTemp = new byte[56];
+            System.arraycopy(cTemp, 0, cdTemp, 0, 28);
+            System.arraycopy(dTemp, 0, cdTemp, 28, 28);
+
+            subKeys[i] = permute(cdTemp, PC2);
+
+            c0 = cTemp;
+            d0 = dTemp;
+        }
+
+        return subKeys;
+    }
 }
