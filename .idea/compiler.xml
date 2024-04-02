@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="ModelProject" />
+        <module name="ViewProject" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ModelProject" target="21" />
-      <module name="tripeDES" target="21" />
       <module name="tripleDES" target="21" />
     </bytecodeTargetLevel>
   </component>
