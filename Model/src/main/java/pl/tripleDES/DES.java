@@ -1,5 +1,7 @@
 package pl.tripleDES;
 
+import java.util.Arrays;
+
 public class DES {
     private byte[] key;
     final byte[] pBlock = {16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
@@ -72,51 +74,54 @@ public class DES {
         this.key = key;
     }
 
-    private byte[] permute(byte[] input, byte[] table) {
-        byte[] output = new byte[table.length];
-        for (int i = 0; i < table.length; i++) {
-            int bitIndex = table[i] - 1;
-            int byteIndex = bitIndex / 8;
-            int bitOffset = 7 - (bitIndex % 8);
+    public DES() {}
 
-            byte mask = (byte) (1 << bitOffset);
-            output[i] = (byte) ((input[byteIndex] & mask) != 0 ? 1 : 0);
+    private byte[] permute(byte[] input, byte[] permArray, int outputLength) {
+        byte[] permutedBits = new byte[outputLength];
+        for (int j = 0; j < outputLength; j++) {
+            int index = permArray[j] - 1;
+            if (index >= 0 && index < input.length) {
+                permutedBits[j] = input[index];
+            }
         }
-        return output;
+        return permutedBits;
     }
 
-    private byte[] leftShift(byte[] input, int shift) {
-        byte[] output = new byte[input.length];
-        for (int i = 0; i < input.length; i++) {
-            output[i] = input[(i + shift) % input.length];
+    private byte[] shiftBits(byte[] input) {
+        byte[] shifted = new byte[input.length];
+        for (int i = 0; i < input.length - 1; i++) {
+            shifted[i] = input[i + 1];
         }
-        return output;
+        shifted[input.length - 1] = input[0];
+        return shifted;
     }
+
+    private byte[] mergeArrays(byte[] left, byte[] right) {
+        byte[] merged = new byte[left.length + right.length];
+        System.arraycopy(left, 0, merged, 0, left.length);
+        System.arraycopy(right, 0, merged, left.length, right.length);
+        return merged;
+    }
+
 
     public byte[][] generateSubKeys() {
-        byte[] permutedKey = permute(key, PC1);
+        byte[][] subKeys = new byte[16][];
 
-        byte[] c0 = new byte[28];
-        byte[] d0 = new byte[28];
-        System.arraycopy(permutedKey, 0, c0, 0, 28);
-        System.arraycopy(permutedKey, 28, d0, 0, 28);
+        byte[] PC1Bits = permute(key, PC1, 56);
 
-        byte[][] subKeys = new byte[16][48];
+        byte[] leftHalf = Arrays.copyOfRange(PC1Bits, 0, 28);
+        byte[] rightHalf = Arrays.copyOfRange(PC1Bits, 28, 56);
 
         for (int i = 0; i < 16; i++) {
-            byte[] cTemp = leftShift(c0, shifts[i]);
-            byte[] dTemp = leftShift(d0, shifts[i]);
+            for (int j = 0; j < shifts[i]; j++) {
+                leftHalf = shiftBits(leftHalf);
+                rightHalf = shiftBits(rightHalf);
+            }
 
-            byte[] cdTemp = new byte[56];
-            System.arraycopy(cTemp, 0, cdTemp, 0, 28);
-            System.arraycopy(dTemp, 0, cdTemp, 28, 28);
+            byte[] mergedKey = mergeArrays(leftHalf, rightHalf);
 
-            subKeys[i] = permute(cdTemp, PC2);
-
-            c0 = cTemp;
-            d0 = dTemp;
+            subKeys[i] = permute(mergedKey, PC2, 48);
         }
-
         return subKeys;
     }
 }
