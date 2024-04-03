@@ -89,9 +89,7 @@ public class DES {
 
     private byte[] shiftBits(byte[] input) {
         byte[] shifted = new byte[input.length];
-        for (int i = 0; i < input.length - 1; i++) {
-            shifted[i] = input[i + 1];
-        }
+        if (input.length - 1 >= 0) System.arraycopy(input, 1, shifted, 0, input.length - 1);
         shifted[input.length - 1] = input[0];
         return shifted;
     }
@@ -123,5 +121,12 @@ public class DES {
             subKeys[i] = permute(mergedKey, PC2, 48);
         }
         return subKeys;
+    }
+
+    public byte[] encryptMessage(byte[] message) {
+        byte[][] subKeys = generateSubKeys();
+        byte[] encryptedBytes = new byte[message.length];
+
+        return null;
     }
 }
