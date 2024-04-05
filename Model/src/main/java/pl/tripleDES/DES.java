@@ -111,15 +111,33 @@ public class DES {
 
     public DES() {}
 
-    private byte[] permute(byte[] input, byte[] permArray, int outputLength) {
-        byte[] permutedBits = new byte[outputLength];
-        for (int j = 0; j < outputLength; j++) {
-            int index = permArray[j] - 1;
-            if (index >= 0 && index < input.length) {
-                permutedBits[j] = input[index];
-            }
+    private int getBit(byte[] input, int pos) {
+        int byteIndex = pos >>> 3;  // Pos / 8
+        int bitIndex = pos & 0b111; // Pos % 8
+        byte byteValue = input[byteIndex];
+        return (byteValue >>> (7 - bitIndex)) & 1;
+    }
+
+    private void setBit(byte[] input, int pos, int value) {
+        int byteIndex = pos >>> 3;     // Calculate byte index (pos / 8)
+        int bitIndex = pos & 0b111;    // Calculate bit index in the byte (pos % 8)
+        byte byteValue = input[byteIndex];
+        if (value == 0) {
+            byteValue = (byte) (~(128 >>> bitIndex) & byteValue);
+        } else {
+            byteValue = (byte) ((128 >>> bitIndex) | byteValue);
         }
-        return permutedBits;
+        input[byteIndex] = byteValue;
+    }
+
+    private byte[] permutation(byte[] input, byte[] permutation, int outputLength) {
+        byte[] output = new byte[outputLength];
+
+        for (int i = 0; i < permutation.length; i++) {
+            setBit(output, i, getBit(input, permutation[i] - 1));
+        }
+
+        return output;
     }
 
     private byte[] shiftBits(byte[] input) {
@@ -136,14 +154,21 @@ public class DES {
         return merged;
     }
 
+    private byte[] copyBits(byte[] input, int from, int count, int outputLength) {
+        byte[] output = new byte[outputLength];
+
+        for (int i = 0; i < count; i++) {
+            setBit(output, i, getBit(input, from + i));
+        }
+
+        return output;
+    }
 
     public byte[][] generateSubKeys() {
-        byte[][] subKeys = new byte[16][];
-
-        byte[] PC1Bits = permute(key, PC1, 56);
-
-        byte[] leftHalf = Arrays.copyOfRange(PC1Bits, 0, 28);
-        byte[] rightHalf = Arrays.copyOfRange(PC1Bits, 28, 56);
+        byte[][] subKeys = new byte[16][48];
+        byte[] key56 = permutation(key, PC1, 7);
+        byte[] leftHalf = copyBits(key56, 0, 28, 4);
+        byte[] rightHalf = copyBits(key56, 28, 28, 4);
 
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < shifts[i]; j++) {
@@ -153,15 +178,9 @@ public class DES {
 
             byte[] mergedKey = mergeArrays(leftHalf, rightHalf);
 
-            subKeys[i] = permute(mergedKey, PC2, 48);
+            subKeys[i] = permutation(mergedKey, PC2, 6);
         }
-        return subKeys;
-    }
 
-    public byte[] encryptMessage(byte[] message) {
-        byte[][] subKeys = generateSubKeys();
-        byte[] encryptedBytes = new byte[message.length];
-
-        return null;
+       return subKeys;
     }
 }
