@@ -18,34 +18,61 @@ public class TripleDES {
     }
 
     public byte[] encryptMessage(byte[] input) {
-        byte[] correctSizeBlocks;
+        int maxIndex = input.length / 8;
+        boolean isMultipleOf8 = input.length % 8 == 0;
+        byte[] output;
 
-        if (input.length % 8 == 0) {
-            correctSizeBlocks = Arrays.copyOf(input, input.length);
+        if (isMultipleOf8) {
+            output = new byte[input.length];
         } else {
-            correctSizeBlocks = Arrays.copyOf(input, input.length + 8 - input.length % 8);
+            output = new byte[maxIndex * 8 + 8];
+            output[output.length - 1] = (byte) (8 - (input.length % 8));
         }
 
-        byte[] firstRound = DES1.encrypt(correctSizeBlocks);
-        byte[] secondRound = DES2.decrypt(firstRound);
-        byte[] thirdRound = DES3.encrypt(secondRound);
+        byte[] block;
 
-        return thirdRound;
+        for (int i = 0; i <= maxIndex; i++) {
+            if (i == maxIndex && isMultipleOf8) {
+                break;
+            }
+
+            block = DES1.encrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
+            block = DES2.encrypt(block);
+            block = DES3.encrypt(block);
+
+            System.arraycopy(block, 0, output, i * 8, 8);
+        }
+
+        return output;
     }
 
     public byte[] decryptMessage(byte[] input) {
-        byte[] correctSizeBlocks;
+        int maxIndex = input.length / 8;
+        boolean isMultipleOf8 = input.length % 8 == 0;
+        byte[] output;
+        int padding = 0;
 
-        if (input.length % 8 == 0) {
-            correctSizeBlocks = Arrays.copyOf(input, input.length);
+        if (isMultipleOf8) {
+            output = new byte[input.length];
         } else {
-            correctSizeBlocks = Arrays.copyOf(input, input.length + 8 - input.length % 8);
+            padding = input[input.length - 1];
+            output = new byte[input.length - (padding == 0 ? 8 : padding)];
         }
 
-        byte[] firstRound = DES3.decrypt(correctSizeBlocks);
-        byte[] secondRound = DES2.encrypt(firstRound);
-        byte[] thirdRound = DES1.decrypt(secondRound);
+        byte[] block;
 
-        return thirdRound;
+        for (int i = 0; i < maxIndex; i++) {
+            block = DES3.decrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
+            block = DES2.decrypt(block);
+            block = DES1.decrypt(block);
+
+            if (i == maxIndex - 1 && !isMultipleOf8) {
+                System.arraycopy(block, 0, output, i * 8, 8 - (padding == 0 ? 8 : padding));
+            } else {
+                System.arraycopy(block, 0, output, i * 8, 8);
+            }
+        }
+
+        return output;
     }
 }
