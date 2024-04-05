@@ -34,6 +34,12 @@ public class Main {
         }
         System.out.println();
 
+        System.out.print("Encrypted message (hex): ");
+        for (byte b : encryptedMessage) {
+            System.out.print(String.format("0x%02X", b & 0xFF));
+        }
+        System.out.println();
+
         byte[] decryptedMessage = tripleDES.decryptMessage(encryptedMessage);
 
         String decryptedString = new String(decryptedMessage);
