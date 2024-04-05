@@ -1,5 +1,7 @@
 package pl.tripleDES;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class Main {
@@ -31,5 +33,11 @@ public class Main {
             System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
         }
         System.out.println();
+
+        byte[] decryptedMessage = tripleDES.decryptMessage(encryptedMessage);
+
+        String decryptedString = new String(decryptedMessage);
+
+        System.out.println("Decrypted message: " + decryptedString);
     }
 }

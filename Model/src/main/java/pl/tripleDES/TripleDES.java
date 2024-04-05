@@ -32,4 +32,20 @@ public class TripleDES {
 
         return thirdRound;
     }
+
+    public byte[] decryptMessage(byte[] input) {
+        byte[] correctSizeBlocks;
+
+        if (input.length % 8 == 0) {
+            correctSizeBlocks = Arrays.copyOf(input, input.length);
+        } else {
+            correctSizeBlocks = Arrays.copyOf(input, input.length + 8 - input.length % 8);
+        }
+
+        byte[] firstRound = DES3.decrypt(correctSizeBlocks);
+        byte[] secondRound = DES2.encrypt(firstRound);
+        byte[] thirdRound = DES1.decrypt(secondRound);
+
+        return thirdRound;
+    }
 }
