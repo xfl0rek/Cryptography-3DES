@@ -4,48 +4,32 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        byte[] initialKey = new byte[]{0x12, 0x34, 0x56, 0x78, (byte)0xAB, (byte)0xCD, (byte)0xEF, 0x09};
+        TripleDES tripleDES = new TripleDES();
 
-        System.out.println("Klucz binarnie:");
-        for (byte b : initialKey) {
-            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
+        byte[] firstKey = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+        byte[] secondKey = {0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+        byte[] thirdKey = {0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17};
+        tripleDES.setKeys(firstKey, secondKey, thirdKey);
+
+        String originalMessage = "Hello, world!";
+        byte[] message = originalMessage.getBytes();
+
+        System.out.println("Original message: " + originalMessage);
+
+        System.out.print("Original message (binary): ");
+        for (byte b : message) {
+            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
         }
         System.out.println();
-        System.out.println();
 
-        DES des = new DES(initialKey);
+        byte[] encryptedMessage = tripleDES.encryptMessage(message);
 
-        byte[][] subKeys = des.generateSubKeys();
+        System.out.println("Encrypted message: " + Arrays.toString(encryptedMessage));
 
-        System.out.println();
-        System.out.println("Podklucze:");
-        for (int i = 0; i < 16; i++) {
-            System.out.println("Subkey " + (i + 1) + ": " + Arrays.toString(subKeys[i]));
-        }
-
-        System.out.println();
-        System.out.println("Podklucze binarnie:");
-        for (int i = 0; i < 16; i++) {
-            System.out.print("Subkey " + (i + 1) + ": ");
-            for (byte b : subKeys[i]) {
-                System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
-            }
-            System.out.println();
+        System.out.print("Encrypted message (binary): ");
+        for (byte b : encryptedMessage) {
+            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
         }
         System.out.println();
-        System.out.println();
-        System.out.println("encrypt:");
-        byte[] encrypt = des.encrypt(initialKey);
-        for (byte b : encrypt) {
-            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
-        }
-
-        System.out.println();
-        System.out.println();
-        System.out.println("decrypt:");
-        byte[] decrypt = des.decrypt(encrypt);
-        for (byte b : decrypt) {
-            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
-        }
     }
 }
