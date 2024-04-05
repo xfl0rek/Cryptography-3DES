@@ -1,10 +1,8 @@
 package pl.tripleDES;
 
-import java.util.Arrays;
-
 public class DES {
     private byte[] key;
-    final byte[] pBlock = {16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
+    final byte[] pBox = {16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10,
                             2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25
     };
 
@@ -182,5 +180,85 @@ public class DES {
         }
 
        return subKeys;
+    }
+
+    public byte[] encryptMessage(byte[] message) {
+        //we are generating sub keys at the beginning of the function. We will use that shit later on.
+        byte[][] subKeys = generateSubKeys();
+        //then we are applying the initial permutation IP to each block of 64 bits.
+        byte[] IPResult = permutation(message, initialPermutation, 8);
+        //Now we divide the permuted block in left and right
+        byte[] left = copyBits(IPResult, 0, 32, 4);
+        byte[] right = copyBits(IPResult, 32, 32, 4);
+
+        //Now we iterate through 16 cycles
+        for (int i = 0; i < 16; i++) {
+            //f function begin
+            //at the beginning of the f function we expand each block from 32 bits to 48 bits.
+            //It's done by using the selection table E.
+            byte[] EPResult = permutation(right, E, 6);
+            //Next we xor the previous output with sub key.
+            byte[] xorResult = xor(EPResult, subKeys[i], 6);
+            //Now do do some shit with S-box. I have no idea how this shit works.
+            byte[] s = sBoxOperation(xorResult);
+            //After this s-box kind of shit we do a permutation P-box of the S-box output to get the final value of f.
+            byte[] PPResult = permutation(s, pBox, 4);
+            //f function end
+            byte[] result = xor(PPResult, left, 4);
+            left = right;
+            right = result;
+        }
+        //we reverse the order of these two blocks
+        byte[] merged = mergeArrays(right, left);
+
+        //and we apply the final permutation. And somehow this shit is working (i think so).
+        return permutation(merged, finalPermutation, 8);
+    }
+
+    public byte[] xor(byte[] bytes1, byte[] bytes2, int byteCount) {
+        byte[] output = new byte[byteCount];
+
+        for (int i = 0; i < byteCount; i++) {
+            output[i] = (byte) (bytes1[i] ^ bytes2[i]);
+        }
+
+        return output;
+    }
+
+    private byte[] return6Bits(byte[] input, int number){
+        byte[] output = {0};
+
+        for(int i = 0; i < input.length; i++){
+            setBit(output, i + 2, getBit(input, i + (number * 6)));
+        }
+
+        return output;
+    }
+
+    private byte[] sBoxOperation(byte[] input) {
+        byte[] output = new byte[4];
+        byte[] column = {0};
+        byte[] row = {0};
+
+        for(int i = 0; i < 8; i++) {
+            byte[] sixBits = return6Bits(input, i);
+            byte[] fourBits = new byte[1];
+
+            setBit(row, 6, getBit(sixBits, 2));
+            setBit(row, 7, getBit(sixBits, 7));
+            setBit(column, 4, getBit(sixBits, 3));
+            setBit(column, 5, getBit(sixBits, 4));
+            setBit(column, 6, getBit(sixBits, 5));
+            setBit(column, 7, getBit(sixBits, 6));
+
+            fourBits[0] = sBoxes[i][16 * row[0] + column[0]];
+
+            setBit(output, (i * 4), getBit(fourBits, 4));
+            setBit(output, 1 + (i * 4), getBit(fourBits, 5));
+            setBit(output, 2 + (i * 4), getBit(fourBits, 6));
+            setBit(output, 3 + (i * 4), getBit(fourBits, 7));
+        }
+
+        return output;
     }
 }

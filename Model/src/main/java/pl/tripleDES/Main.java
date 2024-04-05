@@ -32,5 +32,12 @@ public class Main {
             }
             System.out.println();
         }
+        System.out.println();
+        System.out.println();
+        System.out.println("dupa:");
+        byte[] dupa = des.encryptMessage(initialKey);
+        for (byte b : dupa) {
+            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
+        }
     }
 }
