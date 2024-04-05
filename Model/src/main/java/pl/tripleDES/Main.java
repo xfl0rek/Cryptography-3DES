@@ -34,9 +34,17 @@ public class Main {
         }
         System.out.println();
         System.out.println();
-        System.out.println("dupa:");
-        byte[] dupa = des.encryptMessage(initialKey);
-        for (byte b : dupa) {
+        System.out.println("encrypt:");
+        byte[] encrypt = des.encryptMessage(initialKey);
+        for (byte b : encrypt) {
+            System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
+        }
+
+        System.out.println();
+        System.out.println();
+        System.out.println("decrypt:");
+        byte[] decrypt = des.decryptMessage(encrypt);
+        for (byte b : decrypt) {
             System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
         }
     }

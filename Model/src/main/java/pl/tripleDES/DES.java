@@ -199,7 +199,7 @@ public class DES {
             byte[] EPResult = permutation(right, E, 6);
             //Next we xor the previous output with sub key.
             byte[] xorResult = xor(EPResult, subKeys[i], 6);
-            //Now do do some shit with S-box. I have no idea how this shit works.
+            //Now we do some shit with S-box. I have no idea how this shit works.
             byte[] s = sBoxOperation(xorResult);
             //After this s-box kind of shit we do a permutation P-box of the S-box output to get the final value of f.
             byte[] PPResult = permutation(s, pBox, 4);
@@ -215,7 +215,7 @@ public class DES {
         return permutation(merged, finalPermutation, 8);
     }
 
-    public byte[] xor(byte[] bytes1, byte[] bytes2, int byteCount) {
+    private byte[] xor(byte[] bytes1, byte[] bytes2, int byteCount) {
         byte[] output = new byte[byteCount];
 
         for (int i = 0; i < byteCount; i++) {
@@ -260,5 +260,25 @@ public class DES {
         }
 
         return output;
+    }
+
+    public byte[] decryptMessage(byte[] message) {
+        byte[][] subKeys = generateSubKeys();
+        byte[] FPResult = permutation(message, initialPermutation, 8);
+        byte[] left = copyBits(FPResult, 0, 32, 4);
+        byte[] right = copyBits(FPResult, 32, 32, 4);
+
+        for (int i = 15; i >= 0; i--) {
+            byte[] EPResult = permutation(right, E, 6);
+            byte[] xorResult = xor(EPResult, subKeys[i], 6);
+            byte[] s = sBoxOperation(xorResult);
+            byte[] PPResult = permutation(s, pBox, 4);
+            byte[] result = xor(PPResult, left, 4);
+            left = right;
+            right = result;
+        }
+        byte[] merged = mergeArrays(right, left);
+
+        return permutation(merged, finalPermutation, 8);
     }
 }
