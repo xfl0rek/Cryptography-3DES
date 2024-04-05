@@ -35,7 +35,7 @@ public class Main {
         System.out.println();
         System.out.println();
         System.out.println("encrypt:");
-        byte[] encrypt = des.encryptMessage(initialKey);
+        byte[] encrypt = des.encrypt(initialKey);
         for (byte b : encrypt) {
             System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
         }
@@ -43,7 +43,7 @@ public class Main {
         System.out.println();
         System.out.println();
         System.out.println("decrypt:");
-        byte[] decrypt = des.decryptMessage(encrypt);
+        byte[] decrypt = des.decrypt(encrypt);
         for (byte b : decrypt) {
             System.out.print(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0') + " ");
         }

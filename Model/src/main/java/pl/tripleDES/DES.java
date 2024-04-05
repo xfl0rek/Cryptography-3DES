@@ -182,7 +182,7 @@ public class DES {
        return subKeys;
     }
 
-    public byte[] encryptMessage(byte[] message) {
+    public byte[] encrypt(byte[] message) {
         //we are generating sub keys at the beginning of the function. We will use that shit later on.
         byte[][] subKeys = generateSubKeys();
         //then we are applying the initial permutation IP to each block of 64 bits.
@@ -211,7 +211,7 @@ public class DES {
         //we reverse the order of these two blocks
         byte[] merged = mergeArrays(right, left);
 
-        //and we apply the final permutation. And somehow this shit is working (i think so).
+        //and we apply the final permutation. And somehow this shit is working (I think so).
         return permutation(merged, finalPermutation, 8);
     }
 
@@ -262,7 +262,7 @@ public class DES {
         return output;
     }
 
-    public byte[] decryptMessage(byte[] message) {
+    public byte[] decrypt(byte[] message) {
         byte[][] subKeys = generateSubKeys();
         byte[] FPResult = permutation(message, initialPermutation, 8);
         byte[] left = copyBits(FPResult, 0, 32, 4);
