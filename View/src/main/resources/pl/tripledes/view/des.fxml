@@ -10,14 +10,14 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.tripledes.view.DESController">
    <children>
-      <TextField fx:id="key1" layoutX="30.0" layoutY="30.0" prefHeight="25.0" prefWidth="225.0" text="12345678" />
-      <TextField fx:id="key2" layoutX="30.0" layoutY="60.0" prefHeight="25.0" prefWidth="225.0" text="11223344" />
+      <TextField fx:id="key1" layoutX="30.0" layoutY="30.0" prefHeight="25.0" prefWidth="225.0" text="ktgengt1" />
+      <TextField fx:id="key2" layoutX="30.0" layoutY="60.0" prefHeight="25.0" prefWidth="225.0" text="123hle78" />
       <Text layoutX="14.0" layoutY="20.0" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Klucze" wrappingWidth="52.134765625">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </Text>
-      <TextField fx:id="key3" layoutX="30.0" layoutY="90.0" prefHeight="25.0" prefWidth="225.0" text="KLUCZ123" />
+      <TextField fx:id="key3" layoutX="30.0" layoutY="90.0" prefHeight="25.0" prefWidth="225.0" text="87654321" />
       <Text layoutX="14.0" layoutY="47.0" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="#1" wrappingWidth="20.134765625" />
       <Text layoutX="14.0" layoutY="77.0" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="#2" wrappingWidth="20.134765625" />
       <Text layoutX="14.0" layoutY="107.0" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="#3" wrappingWidth="20.134765625" />
