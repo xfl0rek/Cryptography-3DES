@@ -23,17 +23,12 @@
       <Text layoutX="14.0" layoutY="107.0" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="#3" wrappingWidth="20.134765625" />
       <TextArea fx:id="writeText" layoutX="14.0" layoutY="126.0" prefHeight="200.0" prefWidth="200.0" />
       <TextArea fx:id="readText" layoutX="386.0" layoutY="126.0" prefHeight="200.0" prefWidth="200.0" />
-      <Button fx:id="encryptButton" layoutX="251.0" layoutY="126.0" mnemonicParsing="false" onAction="#encrypt" prefHeight="58.0" prefWidth="97.0" text="Szyfruj">
+      <Button fx:id="encryptButton" layoutX="251.0" layoutY="161.0" mnemonicParsing="false" onAction="#encrypt" prefHeight="58.0" prefWidth="97.0" text="Szyfruj">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="clearButton" layoutX="251.0" layoutY="197.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="97.0" text="Wyczyść">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Button>
-      <Button fx:id="decryptButton" layoutX="251.0" layoutY="267.0" mnemonicParsing="false" onAction="#decrypt" prefHeight="58.0" prefWidth="97.0" text="Deszyfruj">
+      <Button fx:id="decryptButton" layoutX="251.0" layoutY="236.0" mnemonicParsing="false" onAction="#decrypt" prefHeight="58.0" prefWidth="97.0" text="Deszyfruj">
          <font>
             <Font size="18.0" />
          </font>
@@ -48,7 +43,7 @@
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="decryptFileButton" layoutX="413.0" layoutY="31.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="134.0" text="Deszufruj plik">
+      <Button fx:id="decryptFileButton" layoutX="413.0" layoutY="31.0" mnemonicParsing="false" onAction="#decryptFile" prefHeight="40.0" prefWidth="134.0" text="Deszufruj plik">
          <font>
             <Font size="18.0" />
          </font>

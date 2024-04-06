@@ -1,6 +1,5 @@
 package pl.tripledes.view;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -31,15 +30,6 @@ public class DESController {
 
     @FXML
     private TextArea readText;
-
-    @FXML
-    private Button clearButton;
-
-    @FXML
-    private Button encryptFileButton;
-
-    @FXML
-    private Button decryptFileButton;
 
     @FXML
     private Label fileStatus;
@@ -129,4 +119,30 @@ public class DESController {
         }
     }
 
+    @FXML
+    public void decryptFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Proszę wybrać plik");
+        File selectedFile = fileChooser.showOpenDialog(new Stage());
+
+        try {
+            byte[] key1Bytes = Arrays.copyOf(key1.getText().getBytes(StandardCharsets.UTF_8), 8);
+            byte[] key2Bytes = Arrays.copyOf(key2.getText().getBytes(StandardCharsets.UTF_8), 8);
+            byte[] key3Bytes = Arrays.copyOf(key3.getText().getBytes(StandardCharsets.UTF_8), 8);
+
+            tripleDES.setKeys(key1Bytes, key2Bytes, key3Bytes);
+
+            byte[] fileBytes = FileUtils.readFileToByteArray(selectedFile);
+            byte[] decodedBytes = tripleDES.decryptMessage(fileBytes);
+
+            File destination = fileChooser.showSaveDialog(new Stage());
+            FileUtils.writeByteArrayToFile(destination, decodedBytes);
+
+            fileStatus.setText("Odszyfrowano plik.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            fileStatus.setText("Nie udało się odszyfrować.");
+        }
+    }
 }
