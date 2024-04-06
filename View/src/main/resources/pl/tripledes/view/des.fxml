@@ -32,7 +32,7 @@
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="decryptButton" layoutX="251.0" layoutY="267.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="97.0" text="Deszyfruj">
+      <Button fx:id="decryptButton" onAction="#decrypt" layoutX="251.0" layoutY="267.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="97.0" text="Deszyfruj">
          <font>
             <Font size="18.0" />
          </font>

@@ -29,12 +29,6 @@ public class DESController {
     private TextArea readText;
 
     @FXML
-    private Button encryptButton;
-
-    @FXML
-    private Button decryptButton;
-
-    @FXML
     private Button clearButton;
 
     @FXML
@@ -62,6 +56,25 @@ public class DESController {
             text = writeText.getText().getBytes(charset);
             encryptedText = tripleDES.encryptMessage(text);
             readText.setText(new String(encryptedText, charset));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void decrypt() {
+        try {
+            String keyStr1 = key1.getText();
+            String keyStr2 = key2.getText();
+            String keyStr3 = key3.getText();
+
+            byte[] key1Bytes = keyStr1.getBytes(charset);
+            byte[] key2Bytes = keyStr2.getBytes(charset);
+            byte[] key3Bytes = keyStr3.getBytes(charset);
+
+            this.tripleDES.setKeys(key1Bytes, key2Bytes, key3Bytes);
+
+            text = tripleDES.decryptMessage(encryptedText);
+            writeText.setText(new String(text, charset));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
