@@ -110,15 +110,15 @@ public class DES {
     public DES() {}
 
     private int getBit(byte[] input, int pos) {
-        int byteIndex = pos >>> 3;  // Pos / 8
-        int bitIndex = pos & 0b111; // Pos % 8
+        int byteIndex = pos >>> 3;
+        int bitIndex = pos & 0b111;
         byte byteValue = input[byteIndex];
         return (byteValue >>> (7 - bitIndex)) & 1;
     }
 
     private void setBit(byte[] input, int pos, int value) {
-        int byteIndex = pos >>> 3;     // Calculate byte index (pos / 8)
-        int bitIndex = pos & 0b111;    // Calculate bit index in the byte (pos % 8)
+        int byteIndex = pos >>> 3;
+        int bitIndex = pos & 0b111;
         byte byteValue = input[byteIndex];
         if (value == 0) {
             byteValue = (byte) (~(128 >>> bitIndex) & byteValue);
@@ -183,35 +183,25 @@ public class DES {
     }
 
     public byte[] encrypt(byte[] message) {
-        //we are generating sub keys at the beginning of the function. We will use that shit later on.
         byte[][] subKeys = generateSubKeys();
-        //then we are applying the initial permutation IP to each block of 64 bits.
         byte[] IPResult = permutation(message, initialPermutation, 8);
-        //Now we divide the permuted block in left and right
         byte[] left = copyBits(IPResult, 0, 32, 4);
         byte[] right = copyBits(IPResult, 32, 32, 4);
 
-        //Now we iterate through 16 cycles
         for (int i = 0; i < 16; i++) {
             //f function begin
-            //at the beginning of the f function we expand each block from 32 bits to 48 bits.
-            //It's done by using the selection table E.
             byte[] EPResult = permutation(right, E, 6);
-            //Next we xor the previous output with sub key.
             byte[] xorResult = xor(EPResult, subKeys[i], 6);
-            //Now we do some shit with S-box. I have no idea how this shit works.
             byte[] s = sBoxOperation(xorResult);
-            //After this s-box kind of shit we do a permutation P-box of the S-box output to get the final value of f.
             byte[] PPResult = permutation(s, pBox, 4);
-            //f function end
+            // f function end
             byte[] result = xor(PPResult, left, 4);
             left = right;
             right = result;
         }
-        //we reverse the order of these two blocks
+
         byte[] merged = mergeArrays(right, left);
 
-        //and we apply the final permutation. And somehow this shit is working (I think so).
         return permutation(merged, finalPermutation, 8);
     }
 
@@ -244,19 +234,31 @@ public class DES {
             byte[] sixBits = return6Bits(input, i);
             byte[] fourBits = new byte[1];
 
-            setBit(row, 6, getBit(sixBits, 2));
-            setBit(row, 7, getBit(sixBits, 7));
-            setBit(column, 4, getBit(sixBits, 3));
-            setBit(column, 5, getBit(sixBits, 4));
-            setBit(column, 6, getBit(sixBits, 5));
-            setBit(column, 7, getBit(sixBits, 6));
+            int bit1 = getBit(sixBits, 2);
+            int bit6 = getBit(sixBits, 7);
+            int bit2 = getBit(sixBits, 3);
+            int bit3 = getBit(sixBits, 4);
+            int bit4 = getBit(sixBits, 5);
+            int bit5 = getBit(sixBits, 6);
+
+            setBit(row, 6, bit1);
+            setBit(row, 7, bit6);
+            setBit(column, 4, bit2);
+            setBit(column, 5, bit3);
+            setBit(column, 6, bit4);
+            setBit(column, 7, bit5);
 
             fourBits[0] = sBoxes[i][16 * row[0] + column[0]];
 
-            setBit(output, (i * 4), getBit(fourBits, 4));
-            setBit(output, 1 + (i * 4), getBit(fourBits, 5));
-            setBit(output, 2 + (i * 4), getBit(fourBits, 6));
-            setBit(output, 3 + (i * 4), getBit(fourBits, 7));
+            int outputBit1 = getBit(fourBits, 4);
+            int outputBit2 = getBit(fourBits, 5);
+            int outputBit3 = getBit(fourBits, 6);
+            int outputBit4 = getBit(fourBits, 7);
+
+            setBit(output, (i * 4), outputBit1);
+            setBit(output, 1 + (i * 4), outputBit2);
+            setBit(output, 2 + (i * 4), outputBit3);
+            setBit(output, 3 + (i * 4), outputBit4);
         }
 
         return output;
