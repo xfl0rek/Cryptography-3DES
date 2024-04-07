@@ -29,18 +29,16 @@ public class TripleDES {
             output[output.length - 1] = (byte) (8 - (input.length % 8));
         }
 
-        byte[] block;
-
         for (int i = 0; i <= maxIndex; i++) {
             if (i == maxIndex && isMultipleOf8) {
                 break;
             }
 
-            block = DES1.encrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
-            block = DES2.decrypt(block);
-            block = DES3.encrypt(block);
+            byte[] firstRound = DES1.encrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
+            byte[] secondRound = DES2.decrypt(firstRound);
+            byte[] thirdRound = DES3.encrypt(secondRound);
 
-            System.arraycopy(block, 0, output, i * 8, 8);
+            System.arraycopy(thirdRound, 0, output, i * 8, 8);
         }
 
         return output;
@@ -59,17 +57,15 @@ public class TripleDES {
             output = new byte[input.length - (padding == 0 ? 8 : padding)];
         }
 
-        byte[] block;
-
         for (int i = 0; i < maxIndex; i++) {
-            block = DES3.decrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
-            block = DES2.encrypt(block);
-            block = DES1.decrypt(block);
+            byte[] firstRound = DES3.decrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
+            byte[] secondRound = DES2.encrypt(firstRound);
+            byte[] thirdRound = DES1.decrypt(secondRound);
 
             if (i == maxIndex - 1 && !isMultipleOf8) {
-                System.arraycopy(block, 0, output, i * 8, 8 - (padding == 0 ? 8 : padding));
+                System.arraycopy(thirdRound, 0, output, i * 8, 8 - (padding == 0 ? 8 : padding));
             } else {
-                System.arraycopy(block, 0, output, i * 8, 8);
+                System.arraycopy(thirdRound, 0, output, i * 8, 8);
             }
         }
 
