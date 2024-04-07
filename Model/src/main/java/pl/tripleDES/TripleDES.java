@@ -37,7 +37,7 @@ public class TripleDES {
             }
 
             block = DES1.encrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
-            block = DES2.encrypt(block);
+            block = DES2.decrypt(block);
             block = DES3.encrypt(block);
 
             System.arraycopy(block, 0, output, i * 8, 8);
@@ -63,7 +63,7 @@ public class TripleDES {
 
         for (int i = 0; i < maxIndex; i++) {
             block = DES3.decrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
-            block = DES2.decrypt(block);
+            block = DES2.encrypt(block);
             block = DES1.decrypt(block);
 
             if (i == maxIndex - 1 && !isMultipleOf8) {
