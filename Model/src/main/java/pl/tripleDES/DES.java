@@ -110,22 +110,23 @@ public class DES {
     public DES() {}
 
     private int getBit(byte[] input, int pos) {
-        int byteIndex = pos >>> 3;
-        int bitIndex = pos & 0b111;
-        byte byteValue = input[byteIndex];
-        return (byteValue >>> (7 - bitIndex)) & 1;
+        int byteIndex = pos / 8;
+        int bitIndex = pos % 8;
+        byte mask = (byte) (1 << (7 - bitIndex));
+
+        return (input[byteIndex] & mask) == 0 ? 0 : 1;
     }
 
     private void setBit(byte[] input, int pos, int value) {
-        int byteIndex = pos >>> 3;
-        int bitIndex = pos & 0b111;
-        byte byteValue = input[byteIndex];
+        int byteIndex = pos / 8;
+        int bitIndex = pos % 8;
+        byte mask = (byte) (1 << (7 - bitIndex));
+
         if (value == 0) {
-            byteValue = (byte) (~(128 >>> bitIndex) & byteValue);
+            input[byteIndex] &= ~mask;
         } else {
-            byteValue = (byte) ((128 >>> bitIndex) | byteValue);
+            input[byteIndex] |= mask;
         }
-        input[byteIndex] = byteValue;
     }
 
     private byte[] permutation(byte[] input, byte[] permutation, int outputLength) {
