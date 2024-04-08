@@ -107,6 +107,7 @@ public class DES {
         this.key = key;
     }
 
+    //pobieramy wartość bitu z tablicy input z pozycji pos
     private int getBit(byte[] input, int pos) {
         int byteIndex = pos / 8;
         int bitIndex = pos % 8;
@@ -115,6 +116,7 @@ public class DES {
         return (input[byteIndex] & mask) == 0 ? 0 : 1;
     }
 
+    //ustawiamy wartość bitu w pozycji pos w tablicy input
     private void setBit(byte[] input, int pos, int value) {
         int byteIndex = pos / 8;
         int bitIndex = pos % 8;
@@ -127,6 +129,7 @@ public class DES {
         }
     }
 
+    //wykonuje permutację na tablicy input zgodnie z tablicą permutacji
     private byte[] permutation(byte[] input, byte[] permutation, int outputLength) {
         byte[] output = new byte[outputLength];
 
@@ -137,6 +140,7 @@ public class DES {
         return output;
     }
 
+    //przesuwa bity w tablicy input cyklicznie o jedną pozycję w lewo
     private byte[] shiftBits(byte[] input) {
         byte[] shifted = new byte[input.length];
         if (input.length - 1 >= 0) System.arraycopy(input, 1, shifted, 0, input.length - 1);
@@ -144,6 +148,7 @@ public class DES {
         return shifted;
     }
 
+    //łączy dwie tablice
     private byte[] mergeArrays(byte[] left, byte[] right) {
         byte[] merged = new byte[left.length + right.length];
         System.arraycopy(left, 0, merged, 0, left.length);
@@ -151,6 +156,7 @@ public class DES {
         return merged;
     }
 
+    //kopiuje określoną liczbę bitów z tablicy input od określonej pozycji
     private byte[] copyBits(byte[] input, int from, int count, int outputLength) {
         byte[] output = new byte[outputLength];
 
@@ -166,6 +172,7 @@ public class DES {
         return output;
     }
 
+    //generuje podklucze dla każdej rundy DES-a
     public byte[][] generateSubKeys() {
         byte[][] subKeys = new byte[16][48];
         byte[] key56 = permutation(key, PC1, 7);
@@ -186,6 +193,7 @@ public class DES {
        return subKeys;
     }
 
+    //szyfrowanie wiadomości za pomocą algorytmu DES
     public byte[] encrypt(byte[] message) {
         byte[][] subKeys = generateSubKeys();
         byte[] IPResult = permutation(message, initialPermutation, 8);
@@ -193,12 +201,12 @@ public class DES {
         byte[] right = copyBits(IPResult, 32, 32, 4);
 
         for (int i = 0; i < 16; i++) {
-            //f function begin
+            //początek funkcji f
             byte[] EPResult = permutation(right, E, 6);
             byte[] xorResult = xor(EPResult, subKeys[i], 6);
             byte[] s = sBoxOperation(xorResult);
             byte[] PPResult = permutation(s, pBox, 4);
-            // f function end
+            //koniec funkcji f
             byte[] result = xor(PPResult, left, 4);
             left = right;
             right = result;
@@ -209,6 +217,7 @@ public class DES {
         return permutation(merged, finalPermutation, 8);
     }
 
+    //wykonuje operacje xor na dwóch tablicach bajtów
     private byte[] xor(byte[] bytes1, byte[] bytes2, int byteCount) {
         byte[] output = new byte[byteCount];
 
@@ -219,6 +228,7 @@ public class DES {
         return output;
     }
 
+    //zwraca 6 bitów z tablicy input z określonym indexem bitów, które mają zostać zwrócone
     private byte[] return6Bits(byte[] input, int number){
         byte[] output = {0};
 
@@ -229,6 +239,7 @@ public class DES {
         return output;
     }
 
+    //dokonuje operacji na S-boxach
     private byte[] sBoxOperation(byte[] input) {
         byte[] output = new byte[4];
         byte[] column = {0};
@@ -268,6 +279,7 @@ public class DES {
         return output;
     }
 
+    //odszyfrowuje wiadomość za pomocą algorytmu DES
     public byte[] decrypt(byte[] message) {
         byte[][] subKeys = generateSubKeys();
         byte[] FPResult = permutation(message, initialPermutation, 8);

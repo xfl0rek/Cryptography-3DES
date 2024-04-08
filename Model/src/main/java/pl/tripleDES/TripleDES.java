@@ -9,6 +9,7 @@ public class TripleDES {
 
     public TripleDES() {}
 
+    //ustawia klucze
     public void setKeys(byte[] firstKey, byte[] secondKey, byte[] thirdKey) {
         if (firstKey.length == 8 && secondKey.length == 8 && thirdKey.length == 8) {
             DES1 = new DES(firstKey);
@@ -17,6 +18,7 @@ public class TripleDES {
         }
     }
 
+    //szyfruje wiadomość za pomocą algorytmu 3DES
     public byte[] encryptMessage(byte[] input) {
         byte[] paddedInput = addPadding(input);
         int maxIndex = paddedInput.length / 8;
@@ -33,6 +35,7 @@ public class TripleDES {
         return output;
     }
 
+    //odszyfrowuje wiadomość za pomocą algorytmu 3DES
     public byte[] decryptMessage(byte[] input) {
         int maxIndex = input.length / 8;
         byte[] output = new byte[input.length];
@@ -48,6 +51,7 @@ public class TripleDES {
         return removePadding(output);
     }
 
+    //dodaje dopełnienie do wiadomości, aby jej długość była wielokrotnością 8 bajtów
     private byte[] addPadding(byte[] input) {
         int lastBlockSize = input.length % 8;
         if (lastBlockSize != 0) {
@@ -59,6 +63,7 @@ public class TripleDES {
         return input;
     }
 
+    //usuwa dopełnienie z odszyfrowanej wiadomości
     private byte[] removePadding(byte[] input) {
         int paddingSize = input[input.length - 1];
         if (paddingSize > 0 && paddingSize <= 8) {
