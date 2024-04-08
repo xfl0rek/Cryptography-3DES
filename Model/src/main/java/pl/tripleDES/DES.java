@@ -157,7 +157,12 @@ public class DES {
         byte[] output = new byte[outputLength];
 
         for (int i = 0; i < count; i++) {
-            setBit(output, i, getBit(input, from + i));
+            int inputBitIndex = from + i;
+            int outputByteIndex = i / 8;
+            int outputBitIndex = i % 8;
+
+            int bitValue = getBit(input, inputBitIndex);
+            output[outputByteIndex] |= (bitValue << (7 - outputBitIndex));
         }
 
         return output;
