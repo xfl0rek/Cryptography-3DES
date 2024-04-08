@@ -107,8 +107,6 @@ public class DES {
         this.key = key;
     }
 
-    public DES() {}
-
     private int getBit(byte[] input, int pos) {
         int byteIndex = pos / 8;
         int bitIndex = pos % 8;
@@ -123,7 +121,7 @@ public class DES {
         byte mask = (byte) (1 << (7 - bitIndex));
 
         if (value == 0) {
-            input[byteIndex] &= ~mask;
+            input[byteIndex] &= (byte) ~mask;
         } else {
             input[byteIndex] |= mask;
         }
@@ -162,7 +160,7 @@ public class DES {
             int outputBitIndex = i % 8;
 
             int bitValue = getBit(input, inputBitIndex);
-            output[outputByteIndex] |= (bitValue << (7 - outputBitIndex));
+            output[outputByteIndex] |= (byte) (bitValue << (7 - outputBitIndex));
         }
 
         return output;

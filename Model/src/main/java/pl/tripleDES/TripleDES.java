@@ -18,23 +18,12 @@ public class TripleDES {
     }
 
     public byte[] encryptMessage(byte[] input) {
-        int maxIndex = input.length / 8;
-        boolean isMultipleOf8 = input.length % 8 == 0;
-        byte[] output;
+        byte[] paddedInput = addPadding(input);
+        int maxIndex = paddedInput.length / 8;
+        byte[] output = new byte[paddedInput.length];
 
-        if (isMultipleOf8) {
-            output = new byte[input.length];
-        } else {
-            output = new byte[maxIndex * 8 + 8];
-            output[output.length - 1] = (byte) (8 - (input.length % 8));
-        }
-
-        for (int i = 0; i <= maxIndex; i++) {
-            if (i == maxIndex && isMultipleOf8) {
-                break;
-            }
-
-            byte[] firstRound = DES1.encrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
+        for (int i = 0; i < maxIndex; i++) {
+            byte[] firstRound = DES1.encrypt(Arrays.copyOfRange(paddedInput, i * 8, (i + 1) * 8));
             byte[] secondRound = DES2.decrypt(firstRound);
             byte[] thirdRound = DES3.encrypt(secondRound);
 
@@ -46,29 +35,35 @@ public class TripleDES {
 
     public byte[] decryptMessage(byte[] input) {
         int maxIndex = input.length / 8;
-        boolean isMultipleOf8 = input.length % 8 == 0;
-        byte[] output;
-        int padding = 0;
-
-        if (isMultipleOf8) {
-            output = new byte[input.length];
-        } else {
-            padding = input[input.length - 1];
-            output = new byte[input.length - (padding == 0 ? 8 : padding)];
-        }
+        byte[] output = new byte[input.length];
 
         for (int i = 0; i < maxIndex; i++) {
             byte[] firstRound = DES3.decrypt(Arrays.copyOfRange(input, i * 8, (i + 1) * 8));
             byte[] secondRound = DES2.encrypt(firstRound);
             byte[] thirdRound = DES1.decrypt(secondRound);
 
-            if (i == maxIndex - 1 && !isMultipleOf8) {
-                System.arraycopy(thirdRound, 0, output, i * 8, 8 - (padding == 0 ? 8 : padding));
-            } else {
-                System.arraycopy(thirdRound, 0, output, i * 8, 8);
-            }
+            System.arraycopy(thirdRound, 0, output, i * 8, 8);
         }
 
-        return output;
+        return removePadding(output);
+    }
+
+    private byte[] addPadding(byte[] input) {
+        int lastBlockSize = input.length % 8;
+        if (lastBlockSize != 0) {
+            int paddingSize = 8 - lastBlockSize;
+            byte[] paddedInput = Arrays.copyOf(input, input.length + paddingSize);
+            Arrays.fill(paddedInput, input.length, paddedInput.length, (byte) paddingSize);
+            return paddedInput;
+        }
+        return input;
+    }
+
+    private byte[] removePadding(byte[] input) {
+        int paddingSize = input[input.length - 1];
+        if (paddingSize > 0 && paddingSize <= 8) {
+            return Arrays.copyOfRange(input, 0, input.length - paddingSize);
+        }
+        return input;
     }
 }
